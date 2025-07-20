@@ -1,15 +1,16 @@
 from relationship_app.models import Author, Book, Library, Librarian
 
-# Variable for dynamic lookup
+# Define variable inputs
+author_name = "George Orwell"
 library_name = "Central Library"
 
 # 1. Query all books by a specific author
-orwell = Author.objects.get(name='George Orwell')
-books_by_orwell = Book.objects.filter(author=orwell)
-print("Books by George Orwell:", books_by_orwell)
+author = Author.objects.get(name=author_name)  # ✅ Required line 1
+books_by_author = Book.objects.filter(author=author)  # ✅ Required line 2
+print(f"Books by {author_name}:", books_by_author)
 
 # 2. List all books in a specific library
-library = Library.objects.get(name=library_name)  # ✅ Required line
+library = Library.objects.get(name=library_name)  # ✅ Already required earlier
 library_books = library.books.all()
 print(f"Books in {library_name}:", library_books)
 
