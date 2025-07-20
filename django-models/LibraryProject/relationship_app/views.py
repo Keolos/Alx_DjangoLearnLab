@@ -49,3 +49,27 @@ def logout_view(request):
 
 def register(request):  # ← rename this
     ...
+
+
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import render
+from .models import UserProfile
+
+
+@login_required
+@user_passes_test(lambda u: hasattr(u, 'userprofile') and u.userprofile.role == 'Admin')
+def admin_view(request):
+    return render(request, 'relationship_app/admin_view.html')
+
+@login_required
+@user_passes_test(lambda u: hasattr(u, 'userprofile') and u.userprofile.role == 'Librarian')
+def librarian_view(request):
+    return render(request, 'relationship_app/librarian_view.html')
+
+@login_required
+@user_passes_test(lambda u: hasattr(u, 'userprofile') and u.userprofile.role == 'Member')
+def member_view(request):
+    return render(request, 'relationship_app/member_view.html')
+
+
+
