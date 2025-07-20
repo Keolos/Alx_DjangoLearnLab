@@ -3,6 +3,14 @@ from django.views.generic import DetailView
 from .models import Author, Book, Library, Librarian
 from .models import Library
 from django.views.generic.detail import DetailView
+from django.contrib.auth.decorators import permission_required
+from django.http import HttpResponse
+from .models import Book, Author
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth import login, logout
+
+
 
 # Function-based view: list all books
 def list_books(request):
@@ -16,9 +24,6 @@ class LibraryDetailView(DetailView):
     context_object_name = 'library'
 
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth import login, logout
 
 
 def register_view(request):
@@ -73,3 +78,14 @@ def member_view(request):
 
 
 
+@permission_required('relationship_app.can_add_book')
+def add_book(request):
+    return HttpResponse("You have permission to add a book.")
+
+@permission_required('relationship_app.can_change_book')
+def edit_book(request):
+    return HttpResponse("You have permission to edit a book.")
+
+@permission_required('relationship_app.can_delete_book')
+def delete_book(request):
+    return HttpResponse("You have permission to delete a book.")
