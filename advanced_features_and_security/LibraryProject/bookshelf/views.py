@@ -4,6 +4,7 @@ from django.db.models import Q
 from django import forms
 from .models import Book
 from .forms import BookForm, ExampleForm   # <-- Added ExampleForm import
+from .forms import ExampleForm
 
 
 # --- Search Form for Validation ---
