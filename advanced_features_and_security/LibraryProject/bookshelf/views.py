@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.db.models import Q
 from django import forms
 from .models import Book
-from .forms import BookForm
+from .forms import BookForm, ExampleForm   # <-- Added ExampleForm import
 
 
 # --- Search Form for Validation ---
@@ -42,3 +42,26 @@ def create_book(request):
         form = BookForm()
 
     return render(request, 'bookshelf/create_book.html', {'form': form})
+
+
+# --- Example Form View (for CSRF & validation demo) ---
+def form_example(request):
+    """
+    Handles ExampleForm submissions to demonstrate CSRF and validation.
+    """
+    if request.method == "POST":
+        form = ExampleForm(request.POST)
+        if form.is_valid():
+            # Process form data securely
+            name = form.cleaned_data['name']
+            email = form.cleaned_data['email']
+            message = form.cleaned_data['message']
+            return render(request, 'bookshelf/form_example.html', {
+                'form': form,
+                'success': True,
+                'name': name,
+            })
+    else:
+        form = ExampleForm()
+
+    return render(request, 'bookshelf/form_example.html', {'form': form})
