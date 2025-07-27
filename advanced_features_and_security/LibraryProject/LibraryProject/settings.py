@@ -5,8 +5,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-+*=qsag1-o7+p(63p_d9t6gz-9*=w$1^77!ek%n^a+f6s)x2y6'
 
 # --- Debug & Allowed Hosts ---
-DEBUG = True  # Set to False for production
+DEBUG = False  # Set to False for production
 ALLOWED_HOSTS = ['yourdomain.com', '127.0.0.1']  # Change to your actual domain
+
+# LibraryProject/settings.py
+
+if not DEBUG:  # Only enforce HTTPS in production
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 # --- Installed Apps ---
 INSTALLED_APPS = [
@@ -18,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bookshelf',
     'relationship_app',
+    'django_extensions',
 ]
 
 AUTH_USER_MODEL = 'bookshelf.CustomUser'
@@ -95,3 +106,49 @@ SESSION_COOKIE_SECURE = True
 CSP_DEFAULT_SRC = "'self'"
 CSP_STYLE_SRC = "'self' https://fonts.googleapis.com"
 CSP_SCRIPT_SRC = "'self'"
+
+
+# -------------------------
+# HTTPS and Secure Redirects
+# -------------------------
+
+# Redirect all HTTP requests to HTTPS
+SECURE_SSL_REDIRECT = True  
+
+# HTTP Strict Transport Security (HSTS)
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  
+SECURE_HSTS_PRELOAD = True  
+
+# Secure Cookies
+SESSION_COOKIE_SECURE = True  
+CSRF_COOKIE_SECURE = True  
+
+# Security Headers
+X_FRAME_OPTIONS = "DENY"  # Prevent Clickjacking
+SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevent MIME-type sniffing
+SECURE_BROWSER_XSS_FILTER = True  # Enable browser XSS filter
+
+# -------------------------
+# Notes:
+# - Ensure your server has valid SSL/TLS certificates (Let's Encrypt or similar).
+# - In production, ALLOWED_HOSTS must include your domain name.
+# -------------------------
+
+
+# --- Force HTTPS ---
+SECURE_SSL_REDIRECT = True   # Redirect all HTTP requests to HTTPS
+
+# --- HSTS (HTTP Strict Transport Security) ---
+SECURE_HSTS_SECONDS = 31536000       # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True           # Allow HSTS preloading
+
+# --- Cookies over HTTPS only ---
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+# --- Security Headers ---
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
