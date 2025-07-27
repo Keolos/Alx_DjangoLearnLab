@@ -1,14 +1,15 @@
+<!-- LibraryProject/bookshelf/templates/bookshelf/book_list.html -->
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Book List</title>
 </head>
 <body>
-    <h1>Books</h1>
+    <h1>Book List</h1>
 
     <!-- Search Form -->
     <form method="get">
-        {% csrf_token %}
         {{ form.query.label_tag }} 
         {{ form.query }}
         <button type="submit">Search</button>
@@ -17,12 +18,14 @@
     <hr>
 
     <!-- Book List -->
-    <ul>
+    {% if books %}
+        <ul>
         {% for book in books %}
             <li>{{ book.title }} by {{ book.author }} ({{ book.publication_year }})</li>
-        {% empty %}
-            <li>No books found.</li>
         {% endfor %}
-    </ul>
+        </ul>
+    {% else %}
+        <p>No books found.</p>
+    {% endif %}
 </body>
 </html>
