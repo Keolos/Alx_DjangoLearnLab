@@ -6,8 +6,13 @@ from django.views.generic import ListView
 from django.urls import reverse_lazy
 
 from .models import book
-from .forms import BookForm
+from django import forms
+from .models import book
 
+class BookForm(forms.ModelForm):
+    class Meta:
+        model = book
+        fields = '__all__'
 # DRF imports
 from rest_framework import generics, viewsets, status
 from rest_framework.permissions import IsAuthenticated
