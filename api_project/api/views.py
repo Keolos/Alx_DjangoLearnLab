@@ -1,11 +1,34 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth import login, logout, update_session_auth_hash
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
+from django.views.generic import ListView
+from django.urls import reverse_lazy
 
-# Create your views here.
+from .models import book
+from .forms import BookForm
+
+# DRF imports
+from rest_framework import generics, viewsets, status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.decorators import action
+
+from .serializers import BookSerializer
+
+
+# ============================
+#   Template-based views
+# ============================
+
 class BookListView(ListView):
     model = book
     template_name = 'book_list.html'
     context_object_name = 'books'
     paginate_by = 10
+
+
+@login_required
 @permission_required('api.add_book')
 def add_book(request):
     if request.method == 'POST':
@@ -16,8 +39,11 @@ def add_book(request):
     else:
         form = BookForm()
     return render(request, 'add_book.html', {'form': form})
+
+
+@login_required
 @permission_required('api.change_book')
-def edit_book(request, pk): 
+def edit_book(request, pk):
     book_instance = get_object_or_404(book, pk=pk)
     if request.method == 'POST':
         form = BookForm(request.POST, instance=book_instance)
@@ -27,36 +53,67 @@ def edit_book(request, pk):
     else:
         form = BookForm(instance=book_instance)
     return render(request, 'edit_book.html', {'form': form, 'book': book_instance})
+
+
+@login_required
 @permission_required('api.delete_book')
 def delete_book(request, pk):
     book_instance = get_object_or_404(book, pk=pk)
     if request.method == 'POST':
         book_instance.delete()
-        # return redirect('book_list')  # Removed invalid return statement outside function
-    # return render(request, 'delete_book.html', {'book': book_instance})  # Removed invalid return statement outside function
+        return redirect('book_list')
+    return render(request, 'delete_book.html', {'book': book_instance})
+
+
+@login_required
 @permission_required('api.view_book')
 def book_detail(request, pk):
     book_instance = get_object_or_404(book, pk=pk)
     return render(request, 'book_detail.html', {'book': book_instance})
+
+
+@login_required
 @permission_required('api.view_book')
 def book_list(request):
     books = book.objects.all()
     return render(request, 'book_list.html', {'books': books})
-from django.contrib.auth.decorators import permission_required
-from django.shortcuts import get_object_or_404, redirect
-from .models import book
-from .forms import BookForm
-from django.views.generic import ListView
-from django.views.generic import ListView
-from django.views.generic import DetailView
-from django.views.generic import CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy
-from rest_framework import serializers
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.decorators import action
-from rest_framework import status
+
+
+@login_required
+def profile_view(request):
+    return render(request, 'profile.html', {'user': request.user})
+
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            return redirect('profile')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'change_password.html', {'form': form})
+
+
+@login_required
+def user_profile(request):
+    return render(request, 'user_profile.html', {'user': request.user})
+
+
+# ============================
+#   API views (Django REST Framework)
+# ============================
+
+# ListAPIView (Read-only list endpoint)
+class BookListAPI(generics.ListAPIView):
+    queryset = book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [IsAuthenticated]
+
+
+# Full CRUD ViewSet
 class BookViewSet(viewsets.ModelViewSet):
     queryset = book.objects.all()
     serializer_class = BookSerializer
@@ -73,138 +130,6 @@ class BookViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-from rest_framework import serializers
-from .models import book
-class BookSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = book
-        fields = ['id', 'title', 'author', 'published_date', 'isbn']
-        read_only_fields = ['id']
-        extra_kwargs = {
-            'title': {'required': True},
-            'author': {'required': True},
-            'published_date': {'required': True},
-            'isbn': {'required': True, 'max_length': 13}
-        }
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth import login, logout
-@login_required
-def profile_view(request):
-    return render(request, 'profile.html', {'user': request.user})  
-@login_required
-def change_password(request):   
-    if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)
-            return redirect('profile')
-    else:
-        form = PasswordChangeForm(request.user) 
-    return render(request, 'change_password.html', {'form': form})
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect   
-@login_required
-def user_profile(request):
-    return render(request, 'user_profile.html', {'user': request.user})
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-@login_required
-def user_profile(request):
-    return render(request, 'user_profile.html', {'user': request.user}) 
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-@login_required
-def user_profile(request):
-    return render(request, 'user_profile.html', {'user': request.user})
-from django.contrib.auth.decorators import permission_required
-from django.shortcuts import get_object_or_404, redirect
-from .models import book
-from .forms import BookForm
-@login_required
-@permission_required('api.add_book')
-def add_book(request):
-    if request.method == 'POST':
-        form = BookForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('book_list')
-    else:
-        form = BookForm()
-    return render(request, 'add_book.html', {'form': form})
-@permission_required('api.change_book')
-def edit_book(request, pk):
-    book_instance = get_object_or_404(book, pk=pk)
-    if request.method == 'POST':
-        form = BookForm(request.POST, instance=book_instance)
-        if form.is_valid():
-            form.save()
-            return redirect('book_list')
-    else:
-        form = BookForm(instance=book_instance)
-    return render(request, 'edit_book.html', {'form': form, 'book': book_instance})
-    return render(request, 'edit_book.html', {'book': book_instance})
-@permission_required('api.delete_book')
-def delete_book(request, pk):
-    book_instance = get_object_or_404(book, pk=pk)
-    if request.method == 'POST':
-        book_instance.delete()
-        return redirect('book_list')
-    # return render(request, 'delete_book.html', {'book': book_instance})  # Removed invalid return statement outside function
-@permission_required('api.view_book')
-def book_detail(request, pk):
-    book_instance = get_object_or_404(book, pk=pk)
-    return render(request, 'book_detail.html', {'book': book_instance})
-@permission_required('api.view_book')
-def book_list(request):
-    books = book.objects.all()
-    return render(request, 'book_list.html', {'books': books})
-from django.contrib.auth.decorators import permission_required
-from django.http import HttpResponse
-from django.shortcuts import render, get_object_or_404
-@permission_required('api.view_book')
-def book_detail(request, pk):
-    book_instance = get_object_or_404(book, pk=pk)
-    return render(request, 'book_detail.html', {'book': book_instance})
-def book_list(request):
-    books = book.objects.all()
-    return render(request, 'book_list.html', {'books': books})  
-@permission_required('api.view_book')
-def book_detail(request, pk):
-    book_instance = get_object_or_404(book, pk=pk)
-    return render(request, 'book_detail.html', {'book': book_instance})
-@permission_required('api.view_book')
-def book_list(request):
-    books = book.objects.all()
-    return render(request, 'book_list.html', {'books': books})
-def delete_book(request, pk):
-    book_instance = get_object_or_404(book, pk=pk)
-    if request.method == 'POST':
-        book_instance.delete()
-        return redirect('book_list')
-    return render(request, 'delete_book.html', {'book': book_instance})
-def delete_book(request, pk):
-    book_instance = get_object_or_404(book, pk=pk)
-    if request.method == 'POST':
-        book_instance.delete()
-        return redirect('book_list')
-    return render(request, 'delete_book.html', {'book': book_instance}) 
-def delete_book(request, pk):
-    book_instance = get_object_or_404(book, pk=pk)
-    if request.method == 'POST':
-        book_instance.delete()
-        return redirect('book_list')
-    return render(request, 'delete_book.html', {'book': book_instance})
-
-from .serializers import BookSerializer
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
-class BookViewSet(viewsets.ModelViewSet):
-    queryset = book.objects.all()
-    serializer_class = BookSerializer
-    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
