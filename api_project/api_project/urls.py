@@ -29,3 +29,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('api.urls')),  # include all urls from your app
 ]
+
+from django.contrib import admin
+from django.urls import path, include   # ✅ include is imported here
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('api.urls')),   # ✅ include your app urls here
+]
