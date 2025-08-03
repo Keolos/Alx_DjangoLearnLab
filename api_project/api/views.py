@@ -32,8 +32,8 @@ def delete_book(request, pk):
     book_instance = get_object_or_404(book, pk=pk)
     if request.method == 'POST':
         book_instance.delete()
-        return redirect('book_list')
-    return render(request, 'delete_book.html', {'book': book_instance})
+        # return redirect('book_list')  # Removed invalid return statement outside function
+    # return render(request, 'delete_book.html', {'book': book_instance})  # Removed invalid return statement outside function
 @permission_required('api.view_book')
 def book_detail(request, pk):
     book_instance = get_object_or_404(book, pk=pk)
@@ -152,7 +152,7 @@ def delete_book(request, pk):
     if request.method == 'POST':
         book_instance.delete()
         return redirect('book_list')
-    return render(request, 'delete_book.html', {'book': book_instance})
+    # return render(request, 'delete_book.html', {'book': book_instance})  # Removed invalid return statement outside function
 @permission_required('api.view_book')
 def book_detail(request, pk):
     book_instance = get_object_or_404(book, pk=pk)
@@ -197,3 +197,20 @@ def delete_book(request, pk):
         book_instance.delete()
         return redirect('book_list')
     return render(request, 'delete_book.html', {'book': book_instance})
+
+from .serializers import BookSerializer
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+class BookViewSet(viewsets.ModelViewSet):
+    queryset = book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+    
+    def perform_update(self, serializer):
+        serializer.save(author=self.request.user)
+    
+    def perform_destroy(self, instance):
+        instance.delete()
