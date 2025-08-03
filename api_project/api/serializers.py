@@ -99,3 +99,16 @@ def delete_book(request, pk):
         book_instance.delete()
         return redirect('book_list')
     return render(request, 'delete_book.html', {'book': book_instance})
+from rest_framework import serializers
+from .models import book, author  # import your models
+
+class BookSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = book
+        fields = ['id', 'title', 'author', 'published_date', 'isbn']
+
+
+class AuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = author
+        fields = ['id', 'name', 'email']

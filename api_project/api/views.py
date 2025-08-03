@@ -321,3 +321,4 @@ class BookViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         instance.delete()
+from .serializers import BookSerializer

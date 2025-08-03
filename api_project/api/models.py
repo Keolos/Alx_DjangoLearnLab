@@ -24,16 +24,3 @@ class author(models.Model):
             ("can_delete_author", "Can delete author"),
         ]
 
-
-class BookSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = book
-        fields = ['id', 'title', 'author', 'published_date', 'isbn']
-
-# Settings for Django REST Framework
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
