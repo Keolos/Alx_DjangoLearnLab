@@ -139,3 +139,8 @@ class BookViewSet(viewsets.ModelViewSet):
     
     def perform_destroy(self, instance):
         instance.delete()
+
+class BookList(generics.ListAPIView):
+    queryset = book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [IsAuthenticated]
