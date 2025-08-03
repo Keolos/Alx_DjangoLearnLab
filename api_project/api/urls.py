@@ -59,6 +59,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets
 from .models import book
 from .serializers import BookSerializer
+from rest_framework.routers import DefaultRouter
 class BookViewSet(viewsets.ModelViewSet):
     queryset = book.objects.all()
     serializer_class = BookSerializer
@@ -78,3 +79,28 @@ class BookViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+        router = DefaultRouter()
+        router.register(r'books_all', BookViewSet, basename='book_all')
+
+    def perform_update(self, serializer):
+        serializer.save(author=self.request.user)
+        return Response(serializer.data)
+        instance.delete()
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from .models import book
+from .serializers import BookSerializer
+class BookListAPI(generics.ListAPIView):
+    queryset = book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [IsAuthenticated]
+        # Remove this line. `instance.delete()` is not needed in perform_update and will cause errors.
+
+urlpatterns = [
+    # Route for the BookList view (ListAPIView)
+    path('books/', BookList.as_view(), name='book-list'),
+
+    # Include the router URLs for BookViewSet (all CRUD operations)
+    path('', include(router.urls)),  # This includes all routes registered with the router
+]

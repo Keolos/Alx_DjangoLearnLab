@@ -144,3 +144,25 @@ class BookList(generics.ListAPIView):
     queryset = book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticated]
+    class BookViewSet(viewsets.ModelViewSet):
+        queryset = book.objects.all()
+        serializer_class = BookSerializer
+        permission_classes = [IsAuthenticated]
+
+        def perform_create(self, serializer):
+            serializer.save(author=self.request.user)
+
+        def perform_update(self, serializer):
+            serializer.save(author=self.request.user)
+
+            # Another example of a ModelViewSet for books
+            class BookModelViewSet(viewsets.ModelViewSet):
+                queryset = book.objects.all()
+                serializer_class = BookSerializer
+                permission_classes = [IsAuthenticated]
+
+                def perform_create(self, serializer):
+                    serializer.save(author=self.request.user)
+
+                def perform_update(self, serializer):
+                    serializer.save(author=self.request.user)
