@@ -2,6 +2,9 @@ from django.urls import path
 from .views import list_books, LibraryDetailView
 
 
+urlpatterns = [
+    path('books/', BookList.as_view(), name='book-list'),  # Maps to the BookList view
+]
 
 urlpatterns = [
     path('books/', list_books, name='list_books'),  # FBV
