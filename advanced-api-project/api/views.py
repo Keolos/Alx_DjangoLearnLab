@@ -7,14 +7,69 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
 from django_filters import rest_framework
-from filters.OrderingFilter import OrderingFilter
-from filters.SearchFilter import SearchFilter
-from filters.DjangoFilterBackend import DjangoFilterBackend
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAdminUser
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework import status
+from rest_framework.response import Response
 
 
 # ================================
 # BOOK CRUD VIEWS
 # ================================
+
+
+# Existing function-based views
+@api_view(['GET'])
+def book_list(request):
+    genre = request.query_params.get('genre')
+    if genre:
+        books = Book.objects.filter(genre=genre)
+    else:
+        books = Book.objects.all()
+    serializer = BookSerializer(books, many=True)
+    return Response(serializer.data)
+ 
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_book(request):
+    serializer = BookSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# New update_book function
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_book(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+    serializer = BookSerializer(book, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# New delete_book function
+@api_view(['DELETE'])
+@permission_classes([IsAdminUser])
+def delete_book(request, pk):
+    try:
+        book = Book.objects.get(pk=pk)
+    except Book.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    # Only admin/staff can delete
+    if not request.user.is_staff:
+        return Response({"detail": "You do not have permission to delete this book."},
+                        status=status.HTTP_403_FORBIDDEN)
+
+    book.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 
 class BookListView(generics.ListAPIView):
     """
@@ -24,7 +79,16 @@ class BookListView(generics.ListAPIView):
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly] 
+    
+
+    def get_queryset(self):
+        queryset = Book.objects.all()
+        genre = self.request.query_params.get('genre')
+        if genre:
+            queryset = queryset.filter(genre=genre)
+        return queryset
+
 
 
 class BookDetailView(generics.RetrieveAPIView):

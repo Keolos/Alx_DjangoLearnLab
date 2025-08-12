@@ -24,10 +24,7 @@ urlpatterns = [
     path('books/<int:pk>/delete/', BookDeleteView.as_view(), name='book-delete'),
 
     # Function-based API endpoints for update and delete
-    path('books/update/<int:pk>/', update_book, name='api-book-update'),
-    path('books/delete/<int:pk>/', delete_book, name='api-book-delete'),
-
-    # DRF router URLs
+   
     path('', include(router.urls)),
     
 ]
