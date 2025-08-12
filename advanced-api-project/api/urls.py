@@ -29,4 +29,5 @@ urlpatterns = [
 
     # DRF router URLs
     path('', include(router.urls)),
+    
 ]
