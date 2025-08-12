@@ -125,3 +125,15 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# redirect after login/logout
+LOGIN_REDIRECT_URL = 'post-list'
+LOGOUT_REDIRECT_URL = 'post-list'
+
+# Media (for user-uploaded profile images) - development only
+MEDIA_URL = '/media/'
+import os
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# (Optional) ensure request is available in templates (already included usually)
+# 'django.template.context_processors.request' is present in your TEMPLATES config
