@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from rest_framework import generics, permissions, viewsets
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework import generics, viewsets
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from .models import Book
 from .serializers import BookSerializer
 
@@ -16,7 +16,7 @@ class BookListView(generics.ListAPIView):
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class BookDetailView(generics.RetrieveAPIView):
@@ -27,7 +27,7 @@ class BookDetailView(generics.RetrieveAPIView):
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class BookCreateView(generics.CreateAPIView):
@@ -62,15 +62,12 @@ class BookDeleteView(generics.DestroyAPIView):
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticated]
 
-
 # ================================
-# OPTIONAL: VIEWSET IMPLEMENTATION
+# BOOK VIEWSET
 # ================================
-
 class BookViewSet(viewsets.ModelViewSet):
     """
-    A ViewSet for viewing, creating, updating, and deleting books.
-    Combines all CRUD operations in one class.
+    A ViewSet for viewing and editing book instances.
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
