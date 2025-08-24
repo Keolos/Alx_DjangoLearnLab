@@ -14,6 +14,10 @@ from django.views.generic import ListView, DetailView
 from .models import Post
 from .forms import CustomUserCreationForm, UserUpdateForm, ProfileUpdateForm
 from django.contrib.auth.models import User
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from .models import Post
 
 
 # Create your views here.
