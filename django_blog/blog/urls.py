@@ -8,6 +8,9 @@ from .views import (
 )
 
 from . import views
+from .views import SearchResultsView
+
+
 urlpatterns = [
     # Blog post URLs
     path('', PostListView.as_view(), name='post-list'),
@@ -47,5 +50,7 @@ urlpatterns = [
 
     path('search/', views.search_posts, name='search'),
     path('tags/<slug:tag_slug>/', views.PostListView.as_view(), name='posts-by-tag'),
+    path('search/', SearchResultsView.as_view(), name='search'),
+
 
 ]
