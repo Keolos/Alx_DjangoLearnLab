@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -132,8 +133,15 @@ LOGOUT_REDIRECT_URL = 'post-list'
 
 # Media (for user-uploaded profile images) - development only
 MEDIA_URL = '/media/'
-import os
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # (Optional) ensure request is available in templates (already included usually)
 # 'django.template.context_processors.request' is present in your TEMPLATES config
+STATIC_URL = "static/"
+STATICFILES_DIRS = []  # optional if you want global static files
+
+# This ensures Django can find static files in each app's static/ directory
+STATICFILES_DIRS.append(os.path.join(BASE_DIR, 'blog/static'))
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # for production with WhiteNoise
+# --- IGNORE ---
