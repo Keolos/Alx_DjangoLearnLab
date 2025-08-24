@@ -9,7 +9,7 @@ from .views import (
 
 from . import views
 from .views import SearchResultsView
-
+from .views import PostByTagListView
 
 urlpatterns = [
     # Blog post URLs
@@ -51,6 +51,7 @@ urlpatterns = [
     path('search/', views.search_posts, name='search'),
     path('tags/<slug:tag_slug>/', views.PostListView.as_view(), name='posts-by-tag'),
     path('search/', SearchResultsView.as_view(), name='search'),
+    path('tags/<slug:tag_slug>/', PostByTagListView.as_view(), name='posts-by-tag'),
 
 
 ]

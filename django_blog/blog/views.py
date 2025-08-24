@@ -27,6 +27,17 @@ from .models import Post
 from django.db.models import Q   # ✅ for complex queries
 from django.views.generic import ListView
 from .models import Post
+from django.views.generic import ListView
+from .models import Post
+
+
+class PostByTagListView(ListView):
+    model = Post
+    template_name = 'blog/posts_by_tag.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        return Post.objects.filter(tags__slug=self.kwargs.get("tag_slug"))
 
 
 class SearchResultsView(ListView):
