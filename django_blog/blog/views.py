@@ -1,3 +1,7 @@
+from django.shortcuts import render, redirect
+from .forms import CustomUserCreationForm
+from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth import login
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -24,26 +28,31 @@ class PostDetailView(DetailView):
 
 def post_list(request):
     posts = Post.objects.all()
-    return render(request, 'blog/post_list.html', {'posts': posts}) 
+    return render(request, 'blog/post_list.html', {'posts': posts})
+
 
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            messages.success(request, 'Your account has been created. You can now log in.')
+            messages.success(
+                request, 'Your account has been created. You can now log in.')
             return redirect('login')
     else:
         form = CustomUserCreationForm()
     return render(request, 'blog/register.html', {'form': form})
 
 # Profile view + edit
+
+
 @login_required
 def profile(request):
     # if GET => show profile info; if POST => attempt update
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
-        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+        p_form = ProfileUpdateForm(
+            request.POST, request.FILES, instance=request.user.profile)
         if u_form.is_valid() and p_form.is_valid():
             u_form.save()
             p_form.save()
@@ -58,3 +67,35 @@ def profile(request):
         'p_form': p_form,
     }
     return render(request, 'blog/profile.html', context)
+
+
+# Registration
+
+
+def register(request):
+    if request.method == "POST":
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  # auto-login after registration
+            return redirect("profile")
+    else:
+        form = CustomUserCreationForm()
+    return render(request, "blog/register.html", {"form": form})
+
+# Profile page (requires login)
+
+
+@login_required
+def profile(request):
+    return render(request, "blog/profile.html")
+
+# Built-in login/logout views
+
+
+class CustomLoginView(LoginView):
+    template_name = "blog/login.html"
+
+
+class CustomLogoutView(LogoutView):
+    template_name = "blog/logout.html"
