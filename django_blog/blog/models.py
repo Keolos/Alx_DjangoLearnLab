@@ -8,9 +8,14 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from taggit.managers import TaggableManager
+from taggit.managers import TaggableManager
 
 
-# Create your models here.
+class Post(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    tags = TaggableManager()   # ✅ this enables tagging
+    ...
 
 
 class Post(models.Model):
