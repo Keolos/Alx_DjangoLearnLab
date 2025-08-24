@@ -7,6 +7,7 @@ from .views import (
     register, profile, CustomLoginView, CustomLogoutView
 )
 
+from . import views
 urlpatterns = [
     # Blog post URLs
     path('', PostListView.as_view(), name='post-list'),
@@ -43,5 +44,8 @@ urlpatterns = [
          CommentUpdateView.as_view(), name='comment-update'),
     path('comment/<int:pk>/delete/',
          CommentDeleteView.as_view(), name='comment-delete'),
+
+    path('search/', views.search_posts, name='search'),
+    path('tags/<slug:tag_slug>/', views.PostListView.as_view(), name='posts-by-tag'),
 
 ]
