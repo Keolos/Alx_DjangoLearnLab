@@ -1,17 +1,17 @@
 from django.urls import path
 from .views import list_books, LibraryDetailView
-
+from .views import login_view, logout_view, register_view
+from django.urls import path
+from django.contrib.auth.views import LoginView, LogoutView
+from . import views
+from .views import admin_view, librarian_view, member_view
 
 urlpatterns = [
-    path('books/', BookList.as_view(), name='book-list'),  # Maps to the BookList view
-]
+    # Maps to the BookList view
 
-urlpatterns = [
     path('books/', list_books, name='list_books'),  # FBV
     path('libraries/<int:pk>/', LibraryDetailView.as_view(), name='library_detail'),  # CBV
 ]
-
-from .views import login_view, logout_view, register_view
 
 urlpatterns += [
     path('login/', login_view, name='login'),
@@ -20,9 +20,7 @@ urlpatterns += [
 ]
 
 
-from django.urls import path
-from django.contrib.auth.views import LoginView, LogoutView
-from . import views
+
 
 
 urlpatterns = [
@@ -34,7 +32,7 @@ urlpatterns = [
 ]
 
 
-from .views import admin_view, librarian_view, member_view
+
 
 
 urlpatterns += [
